@@ -128,7 +128,7 @@ export const repositories = [
       site_admin: false,
     },
     html_url: "https://github.com/user/project-beta",
-    description: "Another sample project to learn.",
+    description: "Another sample project to learn.Another sample project to learn.Another sample project to learn.Another sample project to learn.Another sample project to learn.Another sample project to learn.",
     fork: false,
     url: "https://api.github.com/repos/user/project-beta",
     forks_url: "https://api.github.com/repos/user/project-beta/forks",
