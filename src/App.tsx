@@ -3,9 +3,22 @@ import "./App.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import TextField from "@mui/material/TextField";
-import { Stack, Box, Select, MenuItem } from "@mui/material";
+import {
+  Stack,
+  Select,
+  MenuItem,
+  CardContent,
+  Typography,
+  Avatar,
+  Card,
+  CardHeader,
+  SelectChangeEvent,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
+import { repositories } from "./repositories";
 
-type RepoObject = {
+export type RepoObject = {
   id: number;
   node_id: string;
   name: string;
@@ -107,44 +120,167 @@ type RepoObject = {
 };
 
 function App() {
-  const [repos, setRepos] = useState([]);
-  const [languages, setLanguages] = useState([]);
+  const [repos, setRepos] = useState<RepoObject[]>(repositories);
+  const [filteredRepos, setFilteredRepos] = useState<RepoObject[]>([]);
+  const [languages, setLanguages] = useState(["JavaScript", "HTML"]);
+  const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [sortingOptions] = useState(["A-Z", "Z-A", "No sorting"]);
+  const [selectedSortingOption, setSelectedSortingOption] = useState("");
 
   const handleTextFieldChange = (username: string) => {
-    axios
-      .get(`https://api.github.com/users/${username}/repos`)
-      .then((response) => {
-        setRepos(response.data); // Store the data in state
+    if (username === "") setRepos([]);
+    // axios
+    //   .get(`https://api.github.com/users/${username}/repos`)
+    //   .then((response) => {
+    //     setRepos(response.data); // Store the data in state
 
-        const languagesList = response.data.map(
-          (repo: RepoObject) => repo.language || "No language"
-        );
-        setLanguages(Array.from(new Set(languagesList)));
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
+    //     const languagesList = response.data.map(
+    //       (repo: RepoObject) => repo.language || "No language"
+    //     );
+    //     languagesList.push("All languages");
+    //     setLanguages(Array.from(new Set(languagesList)));
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error fetching data:", error);
+    //   });
   };
 
-  return (
-    <Stack direction="column" sx={{ display: "flex", alignItems: "center" }}>
-      <Stack direction="row">
-        <TextField
-          label="Search for repos by username"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-            handleTextFieldChange(event?.target.value)
+  const handleChange = (event: SelectChangeEvent<string>) => {
+    setSelectedLanguage(event.target.value);
+  };
+
+  const handleChangeSort = (event: SelectChangeEvent<string>) => {
+    setSelectedSortingOption(event.target.value);
+  };
+
+  useEffect(() => {
+    if (selectedLanguage) {
+      if (selectedLanguage === "All languages") setFilteredRepos(repos);
+      setFilteredRepos(
+        repos?.filter(
+          (repo) =>
+            repo["language"] === selectedLanguage ||
+            (repo["language"] === null && selectedLanguage === "No language")
+        )
+      );
+    }
+  }, [selectedLanguage, repos]);
+
+  useEffect(() => {
+    if (selectedSortingOption) {
+      const reposToSort =
+        filteredRepos?.length > 0 ? [...filteredRepos] : [...repos];
+      const sortedRepos = [...reposToSort].sort(
+        (a: RepoObject, b: RepoObject) => {
+          if (selectedSortingOption === "A-Z") {
+            return a.name.localeCompare(b.name);
+          } else if (selectedSortingOption === "Z-A") {
+            return b.name.localeCompare(a.name);
           }
-        />
-        <Select label="Programming language" value="Programming language">
-          {languages.map((language) => (
-            <MenuItem value={language}>{language}</MenuItem>
+          return 0;
+        }
+      );
+
+      setFilteredRepos(sortedRepos);
+    }
+  }, [selectedSortingOption, repos, filteredRepos]);
+
+  const reposToDisplay = filteredRepos?.length > 0 ? filteredRepos : repos;
+  return (
+    <>
+      <Stack
+        direction="column"
+        sx={{ display: "flex", alignItems: "center", margin: "20px" }}
+      >
+        <Stack
+          direction="column"
+          spacing={2}
+          sx={{ width: "80%", margin: "20px" }}
+        >
+          <TextField
+            fullWidth
+            label="Search for repos by username"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              handleTextFieldChange(event?.target.value)
+            }
+          />
+          {repos?.length > 0 && (
+            <>
+              <FormControl sx={{ width: "100%" }}>
+                <InputLabel>Programming Language</InputLabel>
+                <Select
+                  label="Programming language"
+                  value={selectedLanguage}
+                  onChange={handleChange}
+                >
+                  {languages.map((language) => (
+                    <MenuItem value={language}>{language}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl sx={{ width: "100%" }}>
+                <InputLabel>Sort by</InputLabel>
+                <Select
+                  label="Sort by"
+                  value={selectedSortingOption}
+                  onChange={handleChangeSort}
+                >
+                  {sortingOptions.map((sortOption) => (
+                    <MenuItem value={sortOption}>{sortOption}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </>
+          )}
+        </Stack>
+        <Stack spacing={2} sx={{ width: "80%" }}>
+          {reposToDisplay.map((repo) => (
+            <Card>
+              <CardHeader
+                avatar={
+                  <a
+                    href={repo["owner"]["html_url"]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Avatar src={`${repo["owner"]["avatar_url"]}`}></Avatar>
+                  </a>
+                }
+                title={
+                  <a
+                    href={repo["html_url"]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Typography>{repo["name"]}</Typography>
+                  </a>
+                }
+              ></CardHeader>
+              <CardContent>
+                <Typography
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                  }}
+                >
+                  {repo["description"]}
+                </Typography>
+                <Typography>
+                  Open Issues: {repo["open_issues_count"]}
+                </Typography>
+                <Typography> Watchers: {repo["watchers"]}</Typography>
+                {repo["language"] && (
+                  <Typography> Language: {repo["language"]}</Typography>
+                )}
+              </CardContent>
+            </Card>
           ))}
-        </Select>
+        </Stack>
       </Stack>
-      {repos.map((repo) => (
-        <div>Hello, {repo["id"]}</div>
-      ))}
-    </Stack>
+    </>
   );
 }
 
