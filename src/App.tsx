@@ -1,14 +1,13 @@
 import React from "react";
-import "./App.css";
 import { useEffect, useState } from "react";
 import { Stack } from "@mui/material";
-import { repositories } from "./repositories";
+//import { repositories } from "./repositories"; used for testing
 import { type RepoObject } from "./types";
 import SearchAndFilter from "./components/Search&Filter";
 import InfoCard from "./components/Card";
 
 function App() {
-  const [repos, setRepos] = useState<RepoObject[]>(repositories);
+  const [repos, setRepos] = useState<RepoObject[]>([]);
   const [filteredRepos, setFilteredRepos] = useState<RepoObject[]>([]);
   const [languages, setLanguages] = useState(["JavaScript", "HTML"]);
   const [selectedLanguage, setSelectedLanguage] = useState("");
@@ -30,6 +29,7 @@ function App() {
 
   useEffect(() => {
     if (selectedSortingOption) {
+      // If we have already filtered the repos, we should sort the filtered repos
       const reposToSort =
         filteredRepos?.length > 0 ? [...filteredRepos] : [...repos];
       const sortedRepos = [...reposToSort].sort(

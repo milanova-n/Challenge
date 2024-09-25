@@ -10,12 +10,12 @@ const SearchBox: React.FC<{
     axios
       .get(`https://api.github.com/users/${username}/repos`)
       .then((response) => {
-        setRepos(response.data); // Store the data in state
+        setRepos(response.data);
 
         const languagesList = response.data.map(
-          (repo: RepoObject) => repo.language || "No language"
+          (repo: RepoObject) => repo.language || "No language" // Add option "No Language" if the repo doesnt have a specified language
         );
-        languagesList.push("All languages");
+        languagesList.push("All languages"); //Add option "All languages" when you want to remove the selection of a specific language
         setLanguages(Array.from(new Set(languagesList)));
       })
       .catch((error) => {

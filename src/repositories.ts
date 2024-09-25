@@ -1,5 +1,4 @@
-
-
+// Create repositories array to test the functionality and not to reach the request limit
 export const repositories = [
   {
     id: 1,
