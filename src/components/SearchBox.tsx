@@ -1,17 +1,23 @@
 import { TextField } from "@mui/material";
-import { type SetReposType, type SetLanguagesType, RepoObject } from "../types";
+import {
+  type SetReposType,
+  type SetLanguagesType,
+  RepoObject,
+  SetIsInputDeleted,
+} from "../types";
 import axios from "axios";
 const SearchBox: React.FC<{
   setRepos: SetReposType;
   setLanguages: SetLanguagesType;
-}> = ({ setRepos, setLanguages }) => {
+  setIsInputDeleted: SetIsInputDeleted;
+}> = ({ setRepos, setLanguages, setIsInputDeleted }) => {
   const handleTextFieldChange = (username: string) => {
-    if (username === "") setRepos([]);
+    if (username === "") setIsInputDeleted(true);
     axios
       .get(`https://api.github.com/users/${username}/repos`)
       .then((response) => {
         setRepos(response.data);
-
+        setIsInputDeleted(false);
         const languagesList = response.data.map(
           (repo: RepoObject) => repo.language || "No language" // Add option "No Language" if the repo doesnt have a specified language
         );

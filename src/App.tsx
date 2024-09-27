@@ -9,10 +9,11 @@ import InfoCard from "./components/Card";
 function App() {
   const [repos, setRepos] = useState<RepoObject[]>([]);
   const [filteredRepos, setFilteredRepos] = useState<RepoObject[]>([]);
-  const [languages, setLanguages] = useState(["JavaScript", "HTML"]);
+  const [languages, setLanguages] = useState<string[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState("");
-  const [sortingOptions] = useState(["A-Z", "Z-A", "No sorting"]);
+  const [sortingOptions] = useState(["A-Z", "Z-A"]);
   const [selectedSortingOption, setSelectedSortingOption] = useState("");
+  const [isInputDeleted, setIsInputDeleted] = useState(false);
 
   useEffect(() => {
     if (selectedLanguage) {
@@ -42,10 +43,18 @@ function App() {
           return 0;
         }
       );
-
       setFilteredRepos(sortedRepos);
     }
   }, [selectedSortingOption, repos, filteredRepos]);
+
+  useEffect(() => {
+    if (isInputDeleted) {
+      setSelectedLanguage("");
+      setSelectedSortingOption("");
+      setRepos([]);
+      setFilteredRepos([]);
+    }
+  }, [isInputDeleted]);
 
   const reposToDisplay = filteredRepos?.length > 0 ? filteredRepos : repos;
   return (
@@ -63,6 +72,7 @@ function App() {
         languages={languages}
         setSelectedLanguage={setSelectedLanguage}
         setSelectedSortingOption={setSelectedSortingOption}
+        setIsInputDeleted={setIsInputDeleted}
       ></SearchAndFilter>
       <Stack spacing={2} sx={{ width: "80%" }}>
         {reposToDisplay.map((repo) => (

@@ -4,6 +4,7 @@ import {
   RepoObject,
   SetLanguage,
   SetSortingOption,
+  SetIsInputDeleted,
 } from "../types";
 import SearchBox from "./SearchBox";
 import Filter from "./Filter";
@@ -19,6 +20,7 @@ const SearchAndFilter: React.FC<{
   languages: string[];
   setSelectedLanguage: SetLanguage;
   setSelectedSortingOption: SetSortingOption;
+  setIsInputDeleted: SetIsInputDeleted;
 }> = ({
   setRepos,
   setLanguages,
@@ -29,6 +31,7 @@ const SearchAndFilter: React.FC<{
   languages,
   setSelectedLanguage,
   setSelectedSortingOption,
+  setIsInputDeleted,
 }) => {
   const handleChangeLanguage = (event: SelectChangeEvent<string>) => {
     setSelectedLanguage(event.target.value);
@@ -39,7 +42,11 @@ const SearchAndFilter: React.FC<{
   };
   return (
     <Stack direction="column" spacing={2} sx={{ width: "80%", margin: "20px" }}>
-      <SearchBox setRepos={setRepos} setLanguages={setLanguages}></SearchBox>
+      <SearchBox
+        setRepos={setRepos}
+        setLanguages={setLanguages}
+        setIsInputDeleted={setIsInputDeleted}
+      ></SearchBox>
       {repos?.length > 0 && (
         <Stack direction="row" spacing={1}>
           <Filter

@@ -110,3 +110,5 @@ export type HandleChangeType = (event: SelectChangeEvent<string>) => void;
 export type SetLanguage = (language: string) => void;
 
 export type SetSortingOption = (sortingOption: string) => void;
+
+export type SetIsInputDeleted = (isInputDeleted: boolean) => void;
